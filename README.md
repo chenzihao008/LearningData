@@ -1,7 +1,6 @@
-# learningdata
 # 资料目录
-## 1.[感知算法框架](Data\感知算法框架.md)
-## 2.Transformer
+## 1.[感知算法框架](Data/感知算法框架.md)
+## 2.[Transformer/Swin-transformer/deformable](Data/Transformer.md)
 ## 3.Loss
 ## 4.Optimize
 ## 5.Normalization
@@ -14,18 +13,18 @@
 
 
 # 项目/论文复习整理
-## 目标检测&目标跟踪
+## 一、目标检测&目标跟踪
 ### YOLO8
 ### RTDETR
 
-## 单目3D目标检测
+## 二、单目3D目标检测
 ### MONOCON3D
 
 
-## BEV occupancy占用
+## 三、BEV Occupancy
 ### SURROUNDOCC
 
 
-## 点云
+## 四、点云
 ### POINTNET
 ### PCT
