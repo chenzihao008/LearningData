@@ -1,15 +1,15 @@
 # learningdata
 # 资料目录
-## 感知算法框架
-## Transformer
-## Loss
-## Optimize
-## Normalization
-## 激活函数
-## 多卡训练
-## 量化
-## 世界坐标、相机坐标、图像坐标、像素坐标
-## Cuda编程
+## 1.感知算法框架
+## 2.Transformer
+## 3.Loss
+## 4.Optimize
+## 5.Normalization
+## 6.激活函数
+## 7.多卡训练
+## 8.量化
+## 9.世界坐标、相机坐标、图像坐标、像素坐标
+## 10.Cuda编程
 
 
 
