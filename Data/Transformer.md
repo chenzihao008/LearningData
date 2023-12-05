@@ -3,8 +3,8 @@
 ## 模块
 ### position encoding
 ```
-PE(pos,2i)=sin(pos/1000^(2i/dim))
-PE(pos,2i+1)=cos(pos/1000^(2i/dim))
+PE(pos,2i)=sin(pos/10000^(2i/dim))
+PE(pos,2i+1)=cos(pos/10000^(2i/dim))
 pos->词语在序列中的位置
 i  ->词语向量中某个值的位置
 dim->模型维度(词语向量维度)
@@ -23,7 +23,7 @@ class PositionalEncoding(nn.Module):
  
         pe = torch.zeros(max_len, d_model)
         position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
-        div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
+        div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))  # 10000^(-2i/dim)的转换
         pe[:, 0::2] = torch.sin(position * div_term)## 这里需要注意的是pe[:, 0::2]这个用法，就是从0开始到最后面，补长为2，其实代表的就是偶数位置
         pe[:, 1::2] = torch.cos(position * div_term)##这里需要注意的是pe[:, 1::2]这个用法，就是从1开始到最后面，补长为2，其实代表的就是奇数位置
         ## 上面代码获取之后得到的pe:[max_len*d_model]
@@ -41,11 +41,10 @@ class PositionalEncoding(nn.Module):
         return self.dropout(x)
 ```
 ### attention
+![image](../Data/Transformer/attention.png)
 ### multi-head attention
 ### maskattention
 ## 复杂度计算
-
-## code
 
 # Swin-transformer
 ![image](../picture/Swintransformerframe.png)

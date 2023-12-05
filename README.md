@@ -16,6 +16,7 @@
 ## 一、目标检测&跟踪
 ### YOLO8
 ### RTDETR
+### ByteTrack
 
 ## 二、单目3D目标检测
 ### [MONOCON3D](Paper/MONOCON3D.md)
