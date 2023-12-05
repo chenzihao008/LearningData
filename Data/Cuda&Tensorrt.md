@@ -12,12 +12,12 @@ export LD_LIBRARY_PATH="/home/ubuntu/Public/TensorRT-8.5.1.7/lib:$LD_LIBRARY_PAT
 # 二、cudnn安装教程
 - 官方地址：https://docs.nvidia.com/deeplearning/cudnn/install-guide/index.html
 - 使用 Tar File Installation
-
-# 三、NVIDIA 获取已有docker容器地址 
+# 三、nvidia docker 
+## 1.NVIDIA 获取已有docker容器地址 
 - 该地址是查看有版本container：https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tensorrt/tags
 - 改地址查看不同版本container包含什么版本的cuda、tensorrt： https://docs.nvidia.com/deeplearning/tensorrt/container-release-notes/index.html
 
-# 四、启动镜像
+## 2.启动镜像
 ```
 #!/bin/sh/
 
