@@ -32,5 +32,98 @@ docker run -it \                            #直接进入容器内
 ```
 
 
-# 五、vscode插件安装
+# 五、 vscoed配置
+## 1. vscode插件安装
 ![image](../picture/tensorrt/vs插件.png)
+## 2. 配置
+0.  agt-get install bear
+1. make
+```
+make前记得修改../../config/Makefile.config文件内的cuda配置
+	查看bear版本dpkg -l |grep bear
+	2.4 版本 使用： bear make -j16
+	3.0 以上版本使用：bear -- make -j16
+```
+
+
+2. 按ctl+shift+p 选择 c_cpp_properties.json，会在.vscode 生成c_cpp_properties.json文件
+```
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c17",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "linux-gcc-x64",
+            "compileCommands": "${workspaceFolder}/compile_commands.json" #新增，compile_commands.json 是bear make后才有的
+        }
+    ],
+    "version": 4
+}
+```
+
+3. 配置language
+查看地址：https://code.visualstudio.com/docs/languages/identifiers#:~:text=Language%20Identifiers%20In%20Visual%20Studio%20Code%2C%20each%20language,to%20a%20language%3A%20%22files.associations%22%3A%20%7B%20%22%2A.myphp%22%3A%20%22php%22%20%7D
+```
+在.vscode中创建settings.json 
+加入
+{
+    "files.associations": {
+        "*.cu": "cuda-cpp"
+    }
+}
+```
+4. task 配置
+```
+按ctl+shift+p 
+选择 Configure.Task   
+选择create   
+选择other
+会在.vscode文件夹中生成tasks.json 文件
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "make",  #修改
+            "type": "shell",
+            "command": "make -j16" #修改
+        }
+    ]
+}
+```
+5. debug 配置
+```
+按ctl+shift+p 
+选择dubug：Add  Configure
+选择CUDAC++(CUDA-GDB)
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "CUDA C++: Launch",
+            "type": "cuda-gdb",
+            "request": "launch",
+            "program": "${workspaceFolder}/trt-cuda"  #修改  trt-cuda 要与config/Makefile.config 内APP的名字一致
+        },
+        {
+            "name": "CUDA C++: Attach",
+            "type": "cuda-gdb",
+            "request": "attach"
+        }
+    ]
+}
+
+bebug还是会报错error while loading shared libraries: libncursesw.so.5: cannot open shared object file
+原因说明:https://blog.csdn.net/winter99/article/details/117464598
+使用命令（首先确定有/lib/x86_64-linux-gnu/libncursesw.so.6）：sudo ln -s /lib/x86_64-linux-gnu/libncursesw.so.6 /lib/x86_64-linux-gnu/libncursesw.so.5
+```
