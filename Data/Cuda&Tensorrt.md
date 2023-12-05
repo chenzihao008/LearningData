@@ -32,7 +32,7 @@ docker run -it \                            #直接进入容器内
 ```
 
 
-# 五、 vscoed配置
+# 四、 vscoed配置
 ## 1. vscode插件安装
 ![image](../picture/tensorrt/vs插件.png)
 ## 2. 配置
