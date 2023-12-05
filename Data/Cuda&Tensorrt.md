@@ -4,10 +4,10 @@
 # 一、tensorrt安装	
 - 可以查看Tensorrt匹配的cuda和cudnn版本地址：https://docs.nvidia.com/deeplearning/tensorrt/release-notes/index.html
 - Tensorrt 保存在任意文件夹都可以的,记得在 ~/.bashrc 上加上PATH即可
-'''
+```
 export PATH="/home/ubuntu/Public/TensorRT-8.5.1.7/bin:$PATH"
 export LD_LIBRARY_PATH="/home/ubuntu/Public/TensorRT-8.5.1.7/lib:$LD_LIBRARY_PATH"
-'''
+```
 
 # 二、cudnn安装教程
 - 官方地址：https://docs.nvidia.com/deeplearning/cudnn/install-guide/index.html
