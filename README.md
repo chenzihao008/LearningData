@@ -6,13 +6,12 @@
 ## 5.Normalization
 ## 6.激活函数
 ## 7.多卡训练
-## 8.量化
-## 9.世界坐标、相机坐标、图像坐标、像素坐标
-## 10.[Cuda&Tensorrt](Data/Cuda&Tensorrt.md)
+## 8.[模型优化知识](Data/模型优化知识.md)
+## 9.[Cuda&Tensorrt&量化](Data/Cuda&Tensorrt.md)
 ## 11.训练trick汇总
 
 
-# 项目/论文复习整理
+# 项目整理&实验
 ## 一、目标检测&跟踪
 ### YOLO8
 ### RTDETR
