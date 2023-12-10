@@ -651,4 +651,4 @@ trtexec --onnx=${1} \
 ## QAT
 QAT(Quantization Aware Training)也被称作*显式量化*。我们明确的在模型中添加Q/DQ节点(量化/反量化)，来控制某一个算子的精度。并且*通过fine-tuning来更新模型权重*，让权重学习并适应量化带来的精度误差
 ### Q/DQ
-![image])(../Data/cuda/QDQ.png)
+![image](../Data/cuda/QDQ.png)
