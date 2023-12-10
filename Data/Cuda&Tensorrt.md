@@ -549,6 +549,22 @@ trtexec --onnx=${1} \
 
 ```
 ## Quantization（量化）
+### 流程
+1. 先进行PTQ
+    1. 从多种calibration策略中选取最佳的算法
+    2. 查看是否精度满足，如果不行再下一步。
+2. 进行partial-quantization
+    1. 通过layer-wise的sensitve analysis分析每一层的精度损失
+    2. 尝试fp16 + int8的组合
+    3. fp16用在敏感层(网络入口和出口)，int8用在计算密集处(网络的中间)
+    4. 查看是否精度满足，如果不行再下一步。
+    5. *(注意，这里同时也需要查看计算效率是否得到满足)*
+3. 进行QAT来通过学习权重来适应误差
+    1. 选取PTQ实验中得到的最佳的calibration算法
+    2. 通过fine-tuning来训练权重(大概是原本训练的10%个epoch)
+    3. 查看是否精度满足，如果不行查看模型设计是否有问题
+    4. *(注意，这里同时也需要查看层融合是否被适用，以及Tensor core是否被用)*
+- 普遍来讲，量化后精度下降控制在相对精度损失<=2%是最好的。
 ### PTQ和QAT
 - 训练后量化 : 简称 PTQ（Post Training Quantization）：权重量化，激活量化，需要借助数据在训练后进行校准。
 - 静态量化感知训练 : 简称 QAT（static quantization aware training）：权重量化，激活量化，*在训练过程中*的量化数值进行建模。
@@ -652,3 +668,20 @@ trtexec --onnx=${1} \
 QAT(Quantization Aware Training)也被称作*显式量化*。我们明确的在模型中添加Q/DQ节点(量化/反量化)，来控制某一个算子的精度。并且*通过fine-tuning来更新模型权重*，让权重学习并适应量化带来的精度误差
 ### Q/DQ
 ![image](../Data/cuda/QDQ.png)
+- pytorch支持对已经训练好的模型自动添加Q/DQ节点。详细可以参考
+    - https://github.com/NVIDIA/TensorRT/tree/main/tools/pytorch-quantization
+
+## Pruning(剪枝)
+pruning granularity
+### 流程
+1. 获取一个已经训练好的初始模型
+2. 对这个模型进行剪枝
+    - 我们可以通过训练的方式让DNN去学习哪些权重是可以归零的
+        - (e.g. 使用L1 regularization和BN中的scaling factor让权重归零)
+    - 我们也可以通过自定义一些规则，手动的有规律的去让某些权重归零
+        - (e.g. 对一个1x4的vector进行2:4的weight prunning)
+3. 对剪枝后的模型进行fine-tuning
+    - 有很大的可能性，在剪枝后初期的网络的精度掉点比较严重
+    - 需要fine-tuning这个过程来恢复精度
+    - Fine-tuning后的模型有可能会比之前的精度还要上涨
+4. 获取到一个压缩的模型
