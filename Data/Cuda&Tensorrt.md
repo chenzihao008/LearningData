@@ -549,22 +549,106 @@ trtexec --onnx=${1} \
 
 ```
 ## Quantization（量化）
-### （symmetric quantization）对称映射和（asymmetric quantization）非对称映射
-- NVIDIA默认的mapping就是对称量化，因为快
 ### PTQ和QAT
 - 训练后量化 : 简称 PTQ（Post Training Quantization）：权重量化，激活量化，需要借助数据在训练后进行校准。
 - 静态量化感知训练 : 简称 QAT（static quantization aware training）：权重量化，激活量化，*在训练过程中*的量化数值进行建模。
+
+## PTQ
+### （symmetric quantization）对称映射和（asymmetric quantization）非对称映射
+- NVIDIA默认的mapping就是对称量化，因为快
+
 ### calibration(校准)
 - 权重是固定的，所以可以通过一次计算就可以得到每一层的量化参数。但是activation value(激活值)是根据输入的改变而改变的
+#### calibration dataset
+- 往往很小，但需要尽量有的完整的表征(分布直方图)
+- 常见的算法
+    - Minmax calibration（取最大最小值范围）
+    - Entropy calibration（通过kl散度，寻找threashold，使fp32能分布在和int8上，tensorrt默认使用）
+    - Percentile calibration（例如取前99.9%的数据范围）
+![image](../Data/cuda/calibration.png)
+- 算法选取的方式（nvidia实验结论）
+    - weight的calibration，选用minmax
+    - activation的calibration，选用entropy或者percentile
+- calibration dataset与batch size的关系
+    - tensorrt在创建histogram直方图的时候，如果出现了大于当前histogram可以表示的最大值的时候，TensorRT会直接平方当前histogram的最大值，来扩大存储空间
+    - 总的来讲，calibratio的batch size越大越好，但不是绝对的
 ### Quantization Granularity（量化粒度）
 - 分类：per-tensor、per-channel、per-element
 - 什么时候用那种量化，nvidia实验结论：
-    - 对于activation values，选取per-tensor量化
-    - 对于weights，选取per-channel量化，如conv
+    - 对于activation values(输入的tensor)，选取per-tensor量化
+    - 对于weights（训练完就固定下来的），选取per-channel量化，如conv
         - 1.因为BN计算与线性conv计算的融合 (BN folding)，BN是per-channel的
         - 2.depthwise convolution 也是per-channel的
     - *目前的TensorRT已经默认对于Activation values选用Per-tensor，Weights选用*
-Per-channel
 
-### 量化技巧
 ### 掉精度时需要做的事情
+- 原因：
+    - 1. 量化不可用
+        • TensorRT会权衡量化后所产生的新添的计算或者访存， 是否用INT8还是FP16。
+        • TensorRT中的kernel autotuning会选择核函数来做FP16/INT8的计算。来查看是否在CUDAcore上跑还是在Tensor core上跑
+        • 有可能FP16是在Tensor core上，但转为INT8之后就在CUDA core上了
+    - 2. 层融合问题
+        • 量化后有可能出现之前可以融合的层，不能融合了
+        • 量化会添加reformatter这种更改tensor的格式的算子，如果本来融合的两个算子间添加了这个就不能被融合了
+        • 比如有些算子支持int8，但某些不支持。之前可以融合的，但因为精度不同不能融合了
+- 怎么做
+    1. layer-wise sensitive analysis(层敏感度分析)
+        - 每一个层对于模型的重要度都是不一样的；
+            - 普适情况
+                - 靠近输入或输出部分的layer正常比较重要，因为channel少，信息密度比较大，建议使用FP16；
+                - 中间层channel数量比较多，单层的信息密度比较少，建议使用INT8；
+        - 工具
+            - Polygraphy
+                - 参考地址：
+                    - https://zhuanlan.zhihu.com/p/535021438
+                    - 官网github:https://github.com/NVIDIA/TensorRT/blob/main/tools/Polygraphy/README.md
+                - 安装
+                ```
+                pip install -i https://pypi.douban.com/simple nvidia-pyindex
+                pip install -i https://pypi.douban.com/simple polygraphy
+                ```
+                - 使用示例
+                ```
+                # 生成一个 .onnx 模型作为 polygraphy 的输入
+                # export model.onnx from pytorch
+                # or
+                # export model.onnx from tensorflow
+                ​
+                # 使用上面生成的 model.onnx 构建 TensorRT 引擎，使用 FP16 精度同时在 TensorRT 和 onnxruntime 中运行
+                polygraphy run model.onnx \
+                    --onnxrt --trt \
+                    --workspace 100000000 \
+                    --save-engine=model_FP16.plan \
+                    --atol 1e-3 --rtol 1e-3 \
+                    --fp16 \
+                    --verbose \
+                    --trt-min-shapes 'x:0:[1,1,28,28]' \
+                    --trt-opt-shapes 'x:0:[4,1,28,28]' \
+                    --trt-max-shapes 'x:0:[16,1,28,28]' \
+                    --input-shapes 'x:0:[4,1,28,28]' \
+                    > result-run-FP16.txt
+                ​
+                # 使用上面生成的 model.onnx 构建 TensorRT 引擎，使用 FP32 精度同时在 TensorRT 和 onnxruntime 中运行
+                # 输出所有层的计算结果作对比
+                polygraphy run model.onnx \
+                    --onnxrt --trt \
+                    --workspace 100000000 \
+                    --save-engine=model_FP32_MarkAll.plan \
+                    --atol 1e-3 --rtol 1e-3 \
+                    --verbose \
+                    --onnx-outputs mark all \
+                    --trt-outputs mark all \
+                    --trt-min-shapes 'x:0:[1,1,28,28]' \
+                    --trt-opt-shapes 'x:0:[4,1,28,28]' \
+                    --trt-max-shapes 'x:0:[16,1,28,28]' \
+                    --input-shapes 'x:0:[4,1,28,28]' \
+                    > result-run-FP32-MarkAll.txt
+                ```
+                - 对比结果
+                ![image](../Data/cuda/polygraphy对比结果.jpg)
+### 量化技巧
+
+## QAT
+QAT(Quantization Aware Training)也被称作*显式量化*。我们明确的在模型中添加Q/DQ节点(量化/反量化)，来控制某一个算子的精度。并且*通过fine-tuning来更新模型权重*，让权重学习并适应量化带来的精度误差
+### Q/DQ
+![image])(../Data/cuda/QDQ.png)
