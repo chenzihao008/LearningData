@@ -48,4 +48,4 @@ model.export(format='onnx')
         - python process_engine.py /path/to/engin save/path --profile-enigne
     - 使用draw_engine.py 生成svg图片
         - python draw_engine.py /path/to/graph.json
-[结构图](./yolov8n-int8.engine.graph.json.svg)
+- [结构图](./yolov8n-int8.engine.graph.json.svg)
