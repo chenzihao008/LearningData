@@ -28,7 +28,7 @@ model.export(format='onnx')
     - fp16->0.54ms
 # 转INT8 Tensorrt效果
 ## 默认配置转IN8结果
-- 精度->recall急剧下降且confidence只有量化前一半
+- 精度->recall急剧下降且confidence只有量化前60%
 ![image](./INT8FRISTRESULT.png)
 - 耗时（推理部分）
     - 0.44ms（提升不明显）
