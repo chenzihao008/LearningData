@@ -7,7 +7,6 @@ yolov8部署
 - TensorRT=8.5.1
 - torch=1.10.1
 - 4090 24G
-# 转onnx
 # 使用yolov8n.pt转onnx
 ```
 # 直接执行即可会直接拉取预训练的yolov8n.pt
@@ -38,7 +37,7 @@ model.export(format='onnx')
     - 暂时排除输入输出端导致问题
 - 是否calibrator问题
     - 原始配置：IIint8EntropyCalibrator2
-    - 尝试使用：IIint8MinMaxCalibrator（得到解决）
+    - 尝试使用：IIint8MinMaxCalibrator（只是confidence稍微降低，大体得到解决）
 ![image](./int8minmaxresult.png)
 
 # TensorRT后模型结构 
