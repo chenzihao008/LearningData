@@ -13,7 +13,7 @@
 ## 12.C++笔记
 
 
-# 项目整理&实验
+# 开源项目整理&实验
 ## 一、目标检测&跟踪
 ### YOLO8
 ## [Deployment](work/yolov8/yolov8_depolyment.md)
@@ -25,7 +25,7 @@
 
 
 ## 三、BEV Occupancy
-### [SURROUNDOCC]
+### [SURROUNDOCC](work/surroundocc/surroundocc.md)
 
 
 ## 四、点云
