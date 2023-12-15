@@ -40,4 +40,12 @@ model.export(format='onnx')
     - 尝试使用：IIint8MinMaxCalibrator（只是confidence稍微降低，大体得到解决）
 ![image](./int8minmaxresult.png)
 
-# TensorRT模型结构
+# 获取TensorRT模型结构
+- 用于查看每一层输出输出是int8还是fp32
+- 安装：https://github.com/NVIDIA/TensorRT/tree/release/8.6/tools/experimental/trt-engine-explorer
+- 使用：https://github.com/NVIDIA/TensorRT/tree/release/8.6/tools/experimental/trt-engine-explorer/utils
+    - 使用process_engine.py导出graph
+        - python process_engine.py /path/to/engin save/path --profile-enigne
+    - 使用draw_engine.py 生成svg图片
+        - python draw_engine.py /path/to/graph.json
+[结构图](./yolov8n-int8.engine.graph.json.svg)
