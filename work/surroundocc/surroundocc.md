@@ -19,9 +19,9 @@ conda install -c omgarcia gcc-6 # gcc-6.2
 - 训练过程
 ![image](./%E8%AE%AD%E7%BB%83%E8%BF%87%E7%A8%8B.png)
 ![image](./%E8%AE%AD%E7%BB%83%E5%86%85%E5%AD%98%E5%8D%A0%E7%94%A8.png)
+
 - GT数据结构
 ![image](./gtocc.png)
-
 ```
 数据格式
 [[x,y,z,class]...]
