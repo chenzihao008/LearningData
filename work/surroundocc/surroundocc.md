@@ -19,8 +19,8 @@ conda install -c omgarcia gcc-6 # gcc-6.2
 - 训练过程
 ![image](./%E8%AE%AD%E7%BB%83%E8%BF%87%E7%A8%8B.png)
 ![image](./%E8%AE%AD%E7%BB%83%E5%86%85%E5%AD%98%E5%8D%A0%E7%94%A8.png)
-- gtocc数据结构
-![image](./gtocc.png)
+- GT数据结构
+    ![image](./gtocc.png)
 ```
 数据格式
 [[x,y,z,class]...]
@@ -36,9 +36,11 @@ conda install -c omgarcia gcc-6 # gcc-6.2
 ### 2D featire tO 3D feature 和 3Ddecoer
 - 使用transformer将2dfeature转到3d空间中
 - query如下,对应config->surroundocc.py下的volume配置
+```
 volume_h_ = [100, 50, 25]
 volume_w_ = [100, 50, 25]
 volume_z_ = [8, 4, 2]
+```
 ![image](./3Dfeaturequery.png)
     - 80000 =  100*100*8 第一层的的h*w*z参数
     - 128 embedding_dim
