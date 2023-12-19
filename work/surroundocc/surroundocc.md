@@ -1,5 +1,8 @@
+Surroundocc
+===
 # 论文内容整理
 [xmimd](./Surround.xmind)
+![image](./surroundocc%E6%A1%86%E6%9E%B6.png)
 # 复现
 开源代码：https://github.com/weiyithu/SurroundOcc/tree/main
 - 最好在linux中复现，windows会存在较多问题
@@ -16,19 +19,20 @@
 conda install -c omgarcia gcc-6 # gcc-6.2
 ```
 ## trian
-- 训练过程
-![image](./%E8%AE%AD%E7%BB%83%E8%BF%87%E7%A8%8B.png)
-![image](./%E8%AE%AD%E7%BB%83%E5%86%85%E5%AD%98%E5%8D%A0%E7%94%A8.png)
+1. 训练过程
+    ![image](./%E8%AE%AD%E7%BB%83%E8%BF%87%E7%A8%8B.png)
+    - 显存占用
+    ![image](./%E8%AE%AD%E7%BB%83%E5%86%85%E5%AD%98%E5%8D%A0%E7%94%A8.png)
 
-- GT数据结构
+2. GT数据结构
 ![image](./gtocc.png)
 ```
 数据格式
 [[x,y,z,class]...]
 ```
-- 使用nusecnes 训练
-    - sample=1 24G显存基本占满,偶尔会出现outmemory
-- 问题
+3. 使用nusecnes 训练
+4. sample=1 24G显存基本占满,偶尔会出现outmemory
+5. 问题
     - occ label generation
         - 问题 attribute error: 'open3d.open3d.geometry.PointCloud' has no attribute 'estimate_normals'
 
@@ -37,15 +41,15 @@ conda install -c omgarcia gcc-6 # gcc-6.2
 ### 2D featire tO 3D feature 和 3Ddecoer
 - 使用transformer将2dfeature转到3d空间中
 - query如下,对应config->surroundocc.py下的volume配置
+
+![image](./3Dfeaturequery.png)
 ```
+# 80000 =  100*100*8 第一层的的h*w*z参数
+# 128 embedding_dim
 volume_h_ = [100, 50, 25]
 volume_w_ = [100, 50, 25]
 volume_z_ = [8, 4, 2]
 ```
-![image](./3Dfeaturequery.png)
-    - 80000 =  100*100*8 第一层的的h*w*z参数
-    - 128 embedding_dim
-
 ```
 #路径 projects/mmdet3d_plugin/surroundocc/dense_heads/occ_head.py
 @auto_fp16(apply_to=('mlvl_feats'))
@@ -129,3 +133,25 @@ def multiscale_supervision(gt_occ, ratio, gt_shape):
     
     return gt
 ```
+
+## 通过lidarseg数据生成DenseOcc groundtruth
+- nuscenes标注数据（lidar、3Dbbox）是全局坐标
+![image](./occGT生成.png)
+[code标注](./generate_gt_from_nuscenes.py) 
+### 区分静态和动态物体
+#### 静态物体
+- 直接使用全局静态point合并，然后转换到当前帧的lidar、cam视角下
+#### 动态物体
+1. 获取相对bbox的点，同时将rot转成0
+2. 所有帧下相对bbox的点合并
+3. 后续就用该合并点生成mesh再生成对应的稠密occ
+### 生成结果
+#### mesh
+![iamge](./lidarpoint生成mesh.png)
+
+#### occ
+![front](./%E6%A0%87%E6%B3%A8occ.png)
+![overlook](./%E6%A0%87%E6%B3%A8occ%E4%BF%AF%E8%A7%86%E5%9B%BE.png)
+
+# tensorRT部署
+## 性能测试
