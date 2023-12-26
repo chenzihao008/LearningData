@@ -1,6 +1,6 @@
 Surroundocc
 ===
-# 论文内容整理
+# 论文内容初步整理
 [xmimd](./Surround.xmind)
 ![image](./surroundocc%E6%A1%86%E6%9E%B6.png)
 # 复现
@@ -137,7 +137,7 @@ def multiscale_supervision(gt_occ, ratio, gt_shape):
 ## 通过lidarseg数据生成DenseOcc groundtruth
 - nuscenes标注数据（lidar、3Dbbox）是全局坐标
 ![image](./occGT生成.png)
-[code标注](./generate_gt_from_nuscenes.py) 
+[code 增加注释](./generate_gt_from_nuscenes.py) 
 ### 区分静态和动态物体
 #### 静态物体
 - 直接使用全局静态point合并，然后转换到当前帧的lidar、cam视角下
@@ -153,5 +153,5 @@ def multiscale_supervision(gt_occ, ratio, gt_shape):
 ![front](./%E6%A0%87%E6%B3%A8occ.png)
 ![overlook](./%E6%A0%87%E6%B3%A8occ%E4%BF%AF%E8%A7%86%E5%9B%BE.png)
 
-# tensorRT部署
+# tensorRT部署（待续）
 ## 性能测试

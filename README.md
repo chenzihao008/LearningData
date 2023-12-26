@@ -8,10 +8,11 @@
 ## 7.多卡训练
 ## 8.[模型优化知识](Data/模型优化知识.md)
 ## 9.[Cuda&Tensorrt&量化](Data/Cuda&Tensorrt.md)
-## 10.Sparse Convolution
 ## 11.训练trick汇总
 ## 12.C++笔记
-## 13.数据集
+## 13.[数据集](Data/dataset.md)
+## 14.open3d
+## 15.mmdetection3D
 
 
 # 开源项目整理&实验
@@ -28,9 +29,4 @@
 ## 三、BEV Occupancy
 ### [SURROUNDOCC](work/surroundocc/surroundocc.md)
 
-
-## 四、点云
-### POINTNET
-### PCT
-
-## 五、BEVFUSION 部署
+## 四、[CUDA-BEVFUSION](work/CUDA-BEVFusion/CUDA-BEVFUSION.md)

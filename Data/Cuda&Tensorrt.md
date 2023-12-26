@@ -16,7 +16,7 @@ export LD_LIBRARY_PATH="/home/ubuntu/Public/TensorRT-8.5.1.7/lib:$LD_LIBRARY_PAT
 - 使用 Tar File Installation
 # 三、nvidia docker 
 ## 1.NVIDIA 获取已有docker容器地址 
-- 该地址是查看有版本container：https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tensorrt/tags
+- 该地址是查看tensorrt已有container版本：https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tensorrt/tags
 - 改地址查看不同版本container包含什么版本的cuda、tensorrt： https://docs.nvidia.com/deeplearning/tensorrt/container-release-notes/index.html
 
 ## 2.启动镜像
@@ -35,6 +35,7 @@ docker run -it \                            #直接进入容器内
 
 
 # 四、 vscoed配置
+- 可参考：https://blog.csdn.net/qq_45032341/article/details/133843192
 ## 1. vscode插件安装
 ![image](../picture/tensorrt/vs插件.png)
 ## 2. 配置
@@ -160,7 +161,7 @@ bebug还是会报错error while loading shared libraries: libncursesw.so.5: cann
 ```
 ## 3 cuda core 矩阵乘法运算
 ![image](../Data/cuda/cudacore矩阵乘法.png)
-- 一个block中thread数不能超过1024，大于1024会显示配置错误
+- 一个block中thread数不能超过1024，大于1024会显示配置错误（32**2=1024）
 
 ## 4 工具使用：Nsight systems & Nisght compute 查看计算瓶颈
 - Nsight systems 全局查看核函数、内存、调度
@@ -253,12 +254,12 @@ void SleepMultiStream(
 ![image](../Data/cuda/双线性插值测试.png)
 ```
 - 基础知识：
-    使用opencv读取图像时图像的排列方式是一个三维数组，但并非是三维数组按照[r:[[]] g:[[]] b:[[]]] 然后组合的方式存储。
+    c++使用opencv读取图像时图像的排列方式是一个三维数组，但并非是三维数组按照[r:[[]] g:[[]] b:[[]]] 然后组合的方式存储。
     图片的存储方式可以理解成有个长 * 宽 的矩阵 矩阵的每一个点包括[b, g, r]三个点的数据 是按照*[b,g,r][b,g,r]* 的方式存储
 ```
 - [opencv安装流程]
 官网：https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html
-参考网上该方法： https://zhuanlan.zhihu.com/p/667391183
+参考： https://zhuanlan.zhihu.com/p/667391183
 
 - [coda](../Data/cuda/bilinear_interpolation.cu)
 
@@ -500,6 +501,7 @@ torch.onnx.export(model, input, 'dcn.onnx')
         - 可以更方便的替换算子（结合tensorrt的算子plugin）
 
 # 九、 TensorRT
+- 官网C++API:https://docs.nvidia.com/deeplearning/tensorrt/api/c_api/index.html
 ## 使用trtexec 将onnx转成engine
 - 查看trtexec参数：https://docs.nvidia.com/deeplearning/tensorrt/developer-guide/index.html#trtexec
     - Flags for the Build Phase 构建engine的参数
@@ -565,6 +567,20 @@ trtexec --onnx=${1} \
     3. 查看是否精度满足，如果不行查看模型设计是否有问题
     4. *(注意，这里同时也需要查看层融合是否被适用，以及Tensor core是否被用)*
 - 普遍来讲，量化后精度下降控制在相对精度损失<=2%是最好的。
+
+### int8 quantization 掉精度分析
+1. 输入输出是否使用了int8；
+2. 多任务是否都掉精度了；
+    - 如果只是其中一个task（confidence、、class、bbox）掉精度，大概率不是输入输出的问题；
+3. calibration数据集
+    - 数据集少了
+    - 数据集选的不好，没有涵盖绝大数据训练数据
+    - batchsize是不是选择的不好
+        - batchsize小了的话，分布范围可能会变化很大
+4. calibrator是不是选择的不好
+    - minmax、entropy、percentile、IInt8EntropyCalibrator2等
+5. 是不是某些中间层不应该量化
+6. 使用polygraphy分析
 ### PTQ和QAT
 - 训练后量化 : 简称 PTQ（Post Training Quantization）：权重量化，激活量化，需要借助数据在训练后进行校准。
 - 静态量化感知训练 : 简称 QAT（static quantization aware training）：权重量化，激活量化，*在训练过程中*的量化数值进行建模。
@@ -595,7 +611,7 @@ trtexec --onnx=${1} \
     - 对于weights（训练完就固定下来的），选取per-channel量化，如conv
         - 1.因为BN计算与线性conv计算的融合 (BN folding)，BN是per-channel的
         - 2.depthwise convolution 也是per-channel的
-    - *目前的TensorRT已经默认对于Activation values选用Per-tensor，Weights选用*
+    - *目前的TensorRT已经默认对于Activation values选用Per-tensor，Weights选用per-channel*
 
 ### 掉精度时需要做的事情
 - 原因：
@@ -611,7 +627,7 @@ trtexec --onnx=${1} \
     1. layer-wise sensitive analysis(层敏感度分析)
         - 每一个层对于模型的重要度都是不一样的；
             - 普适情况
-                - 靠近输入或输出部分的layer正常比较重要，因为channel少，信息密度比较大，建议使用FP16；
+                - *靠近输入或输出部分的layer正常比较重要，因为channel少，信息密度比较大，建议使用FP16*；
                 - 中间层channel数量比较多，单层的信息密度比较少，建议使用INT8；
         - 工具
             - Polygraphy
@@ -662,7 +678,6 @@ trtexec --onnx=${1} \
                 ```
                 - 对比结果
                 ![image](../Data/cuda/polygraphy对比结果.jpg)
-### 量化技巧
 
 ## QAT
 QAT(Quantization Aware Training)也被称作*显式量化*。我们明确的在模型中添加Q/DQ节点(量化/反量化)，来控制某一个算子的精度。并且*通过fine-tuning来更新模型权重*，让权重学习并适应量化带来的精度误差
@@ -685,3 +700,43 @@ pruning granularity
     - 需要fine-tuning这个过程来恢复精度
     - Fine-tuning后的模型有可能会比之前的精度还要上涨
 4. 获取到一个压缩的模型
+### 分类
+#### 是否按照规律
+1. 结构化剪枝
+2. 非结构化剪枝
+#### 按照剪枝的粒度与强度
+1. 粗粒度剪枝（Coarse Grain Pruning）
+    - Channel/Kernel Pruning
+        • 这个是比较常见的，也就是直接把某些卷积核给去除掉。
+        • 比较常见的方法就是通过L1Norm寻找权重中影响度比较低的卷积核。
+2. 细粒度剪枝（Fine Grain Pruning）
+    - 主要是对权重的各个元素本身进行分析减枝
+    - 这里面可以分为结构化减枝(structed)与非结构化减枝(unstructed)
+        - 结构化减枝
+            • Vector-wise的减枝: 将权重按照4x1的vector进行分组，每四个中减枝两个的方式减枝权重
+            • Block-wise的减枝: 将权重按照2x2的block进行分区，block之间进行比较的方式来减枝block
+        - 非结构化减枝
+            • Element-wise的减枝：每一个每一个减枝进行分析，看是不是影响度比较高
+    ![image](../Data/cuda/是否结构化剪枝.png)
+
+#### channel_level pruning
+- paper:https://arxiv.org/pdf/1708.06519.pdf
+![image](../Data/cuda/channelpruning.png)
+- 剪枝程度和error
+![image](../Data/cuda/剪枝程度与error的关系.png)
+- 经验
+    • pruning后的channel尽量控制在64的倍数
+        • 要记住最大化tensor core的使用
+    • 对哪些层可以大力度的pruning需要进行sensitive analysis
+        • 要记住DNN中哪些层是敏感层
+
+#### sparse-tensor-core
+参考地址：https://zhuanlan.zhihu.com/p/471048499
+![image](../Data/cuda/sparsetensorcore.png)
+
+
+## 算子Plugin
+[算子Plugin](../Data/cuda/plugin/plugin_step.md)
+
+# cnpy、Aten库
+## cnpy c++读取pytorch数据
