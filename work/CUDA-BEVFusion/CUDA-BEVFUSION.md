@@ -161,6 +161,10 @@ def symbolic_relu(self, ilayer, y, x):
 ![image](./bevfusion_%E4%BB%A3%E7%A0%81%E6%A1%86%E6%9E%B6.png)
 # 代码分析
 ## lidar backborn
+### 输入
+1. ladar pc： n(每一帧的点云数量不是固定的)*5
+### 输出
+1. lidarfeature：1*256*180*180
 ### [lidar_voxelization](./code/voxelization.cu#L235-L269)（增加注释）
 - 用*160000的voxel(1440*1440*40)*承接最多*300000的点*，每个voxel最多10个点
 - 输出lidarfeature=160000*10*5   
@@ -169,7 +173,6 @@ def symbolic_relu(self, ilayer, y, x):
 ### scn
 - 稀疏点云卷积该部分未开源 
 - 可参考CenterPoint的scn代码： https://github.com/tianweiy/CenterPoint/blob/master/det3d/models/backbones/scn.py
-## [liadar_BEVPool]
 ## [camera_backborn](./code/camerbackborn.cu#L68)
 - 该部分为正常的模型推理，load模型后用enqueueV2推理
 ![image](./picture/lss.png)
@@ -200,7 +203,7 @@ def symbolic_relu(self, ilayer, y, x):
 ### 加速操作
 1. 预先计算frustum feature对应的bev 坐标（image->camera->global->lidar），就*可以直接获取 frustum feature 某个点对应的bev坐标是什么了*，减少大量计算操作
 - [code](./code/camera-geometry.cu#L175)（增加注释）
-## [Fusion]
+## Fusion
 - camera bev feature 和 lidar bev feature 融合
 - 该部分也是正常的模型推理，模型只有conv和bn，没有attention之类的操作
 ### 输入
