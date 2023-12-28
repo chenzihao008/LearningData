@@ -239,7 +239,7 @@ class VoxelizationImplement : public Voxelization {
     checkRuntime(cudaMemsetAsync(voxels_temp_, 0xff, voxels_temp_size_, _stream));
     checkRuntime(cudaMemsetAsync(d_voxel_num_, 0, voxel_num_size_, _stream));
     checkRuntime(cudaMemsetAsync(d_real_num_voxels_, 0, sizeof(unsigned int), _stream));
-    // 通过核函数构建hashtabel，即在hashtable中添加voxel占用
+    // 通过核函数构建hashtabel，因为同一个voxel可能会存在多个点云
     cuda_linear_launch(build_hash_table_kernel, //核函数
                         _stream,                
                         num_points,             //当前帧lidarpoints数量，对应kernel启动数量

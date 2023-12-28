@@ -1,8 +1,9 @@
 CUDA-BEVFUSION
+===
 - 根据 BEVFusion: Multi-Task Multi-Sensor Fusion with Unified Bird's-Eye View Representation 进行cuda加速的
 - git：https://github.com/NVIDIA-AI-IOT/Lidar_AI_Solution/tree/master/CUDA-BEVFusion
 ![image](./cuda-bevfusion%E6%A1%86%E6%9E%B6.png)
-===
+
 # 整体优化方向（整体使用FP16）
 1. Camera Encoder: 
     • 一系列前处理(Normalization, resize这些)，*使用CUDA加速*
@@ -152,8 +153,6 @@ def symbolic_relu(self, ilayer, y, x):
 - camera feature point cloud 到 BEV grid ，提前计算映射关系，即上述第2点
 ### Interval Reduction
 - 每个bev grid分配一个tread负责将分配到该grid内feature进行相加，即上述第3点
-# CUDA-BEVFusion中的各个onnx
-
 # CUDA-BEVFusion推理框架设计
 - RAII:Resource Acquisition Is Initialization
 1. 实现类
@@ -161,17 +160,51 @@ def symbolic_relu(self, ilayer, y, x):
 3. 命名空间
 ![image](./bevfusion_%E4%BB%A3%E7%A0%81%E6%A1%86%E6%9E%B6.png)
 # 代码分析
-### [lidar_voxelization](./code/voxelization.cu#L235-L269)
+## lidar backborn
+### [lidar_voxelization](./code/voxelization.cu#L235-L269)（增加注释）
 - 用*160000的voxel(1440*1440*40)*承接最多*300000的点*，每个voxel最多10个点
 - 输出lidarfeature=160000*10*5   
     - 160000个voxel，最多10个有效点，5个feature ； 
-    - 由于只取各个voxel的有效点的平均值且转换成连续空间，lidarfeature 表现为前n个位有效点，后 160000*10 - n 个为无效点
+    - 由于只取各个voxel的有效点的平均值且转换成连续空间，lidarfeature 表现为前 n 个位有效点，后 （160000*10 - n） 个为无效点
 ### scn
 - 稀疏点云卷积该部分未开源 
 - 可参考CenterPoint的scn代码： https://github.com/tianweiy/CenterPoint/blob/master/det3d/models/backbones/scn.py
-### [camera_depth]
-### [camera_BEVPool]
-### [liadar_BEVPool]
-### [Fusion]
+## [liadar_BEVPool]
+## [camera_backborn](./code/camerbackborn.cu#L68)
+- 该部分为正常的模型推理，load模型后用enqueueV2推理
+![image](./picture/lss.png)
+### 两个输入
+1. camera image:6 camera, 3*256 * 704
+2. camera_depth:6 camera, 1*256 * 704(通过点云数据变换获得)
+- 两种feature 在 6*n*32*88 shape下进行cocat，concat后特征为 6*320*32*88
+![image](./picture/cameradepethfeatureconcat.png)
+### 两个输出
+- 上述concat特征经过 卷积 reshape slice 操作获得以下两个输出
+1. camera feature:6*32*88*80    (80ch)
+2. depth weight:6*118*32*88    (118ch)
+## [camera_BEVPool](./code/camera_bevpool.cu#L119)（增加注释）
+- 将camera feature 投影到bev视角下
+- 参考lss， 使用 camera_depth 与 image_feature 得到*伪点云*
+    - camera feature(N*H*W*C) 外积 depth weight(N*D*H*W) 得到 frustum feature(N*D*H*W*C)
+### 输入
+1. camera feature:6*32*88*80    (80ch)
+2. depth weight:6*118*32*88    (118ch)
+### 输出
+1. camera bevfeature ： 360（bevwidth）*360（bevheight）*80（channel）
+### kernel大概流程
+1. 从intervals（也就是相同bev坐标点的组合）获取一个点
+2. 该点的depthweight  乘  camera上该interval对应点的feature，也就是1个depthweight 分别乘 80个channel的值
+3. 从intervals.x（开始点） 到 intervals.y（下一个开始点） 重复操作1-2步，这样一个intervals组内就有一个80channel的feature
+3. 将80个channel的feature 值赋值到对应的bevgrid（360*360*80）上
+- ![image](./picture/interval%E7%A4%BA%E4%BE%8B.png)
+### 加速操作
+1. 预先计算frustum feature对应的bev 坐标（image->camera->global->lidar），就*可以直接获取 frustum feature 某个点对应的bev坐标是什么了*，减少大量计算操作
+- [code](./code/camera-geometry.cu#L175)（增加注释）
+## [Fusion]
 - camera bev feature 和 lidar bev feature 融合
-
+- 该部分也是正常的模型推理，模型只有conv和bn，没有attention之类的操作
+### 输入
+1. camera feature：1*80*180*180
+2. lidar feature：1*256*180*180
+### 输出
+1. middle：1*512*180*180
