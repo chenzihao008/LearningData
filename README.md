@@ -16,7 +16,7 @@
 
 
 # 开源项目整理&实验
-## 一、目标检测&跟踪
+## 一、2D目标检测&跟踪
 ### YOLO8
 ## [Deployment](work/yolov8/yolov8_depolyment.md)
 ### RTDETR
@@ -27,6 +27,15 @@
 
 
 ## 三、BEV Occupancy
-### [SURROUNDOCC](work/surroundocc/surroundocc.md)
+### [SURROUNDOCC: lidar数据生成gt,只有image输入](work/surroundocc/surroundocc.md)
+### [FlashOCC:    只有image输入，全程2d conv ](work/FlashOCC/FlashOCC.md)
+### [UniOcc:      只有image输入，增加2d的depth和sam监督](work/UniOcc/UniOcc.md)
+### [Occ3D]()
+### [OctreeOcc](work/OctreeOcc/OctreeOcc.md)
+### [BEVDet]
+## 四、[CUDA-BEVFUSION：image和lidar融合](work/CUDA-BEVFusion/CUDA-BEVFUSION.md)
+## 五、NERF
+### [NERF](work/NERF/NERF/NERF.md)
+### [Mip-NeRF360](work/NERF/Mip-NeRF360/Mip-NeRF360.md)
 
-## 四、[CUDA-BEVFUSION](work/CUDA-BEVFusion/CUDA-BEVFUSION.md)
+## 六、[mmdetection3D部署相关内容](work/mmdetection3D_deployment/mmdetection3D_deploy.md)

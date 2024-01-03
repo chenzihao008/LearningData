@@ -3,6 +3,9 @@ Surroundocc
 # 论文内容初步整理
 [xmimd](./Surround.xmind)
 ![image](./surroundocc%E6%A1%86%E6%9E%B6.png)
+- 支持范围
+    - 前后左右 [-50m - 50m]
+    - 上下     [-5m - 3m]
 # 复现
 开源代码：https://github.com/weiyithu/SurroundOcc/tree/main
 - 最好在linux中复现，windows会存在较多问题
@@ -154,4 +157,17 @@ def multiscale_supervision(gt_occ, ratio, gt_shape):
 ![overlook](./%E6%A0%87%E6%B3%A8occ%E4%BF%AF%E8%A7%86%E5%9B%BE.png)
 
 # tensorRT部署（待续）
+## 导出onnx问题
+1. torch有相应算子，但是onnx上没有注册
+    - 可以先在 torch/nn/funtionnal.pyi 和 torch/_C/_VariableFuntions.pyi 查看是否相应算子
+        - 如果有相应算子可以直接register_op
+        ```
+        from torch.onnx.symbolic_registry import register_op
+
+        def asinh_symbolic(g, input, *, out=None): #这里的参数除了g，其他和上面两个文件查到的是一样的
+            return g.op("Asinh", input)
+
+        register_op('asinh', asinh_symbolic, '', 9) #第一个参数是目标 ATen 算子名，第二个是要注册的符号函数，这两个参数很好理解。第三个参数是算子的“域”，对于普通 ONNX 算子，直接填空字符串即可。第四个参数表示向哪个算子集版本注册
+        ```
+2. tensortRT转成engine
 ## 性能测试
