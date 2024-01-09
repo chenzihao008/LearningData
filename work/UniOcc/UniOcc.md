@@ -81,10 +81,12 @@ UniOcc
         ```
 ## 代码分析
 ### nerf_head
-- rays获取
-- rays sample
-- 计算render depth 和render semantic loss
-[code增加注释](./code/mmdet3d/models/nerf/nerf_head.py#L307)
+- 过程
+    1. rays获取
+    2. rays sample
+    3. 获取α（吸收能力）和T（剩余光线强度）
+    4. 计算render depth 和render semantic loss
+- [code增加注释](./code/mmdet3d/models/nerf/nerf_head.py#L307)
 
 - 算子输入输出不定的时候可参考以下方式
 [自定义算子可参考(调用)](./code/mmdet3d/models/nerf/nerf_head.py#L221)
