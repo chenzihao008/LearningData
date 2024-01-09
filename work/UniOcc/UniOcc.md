@@ -81,9 +81,15 @@ UniOcc
         ```
 ## 代码分析
 ### nerf_head
--  计算render depth 和render semantic loss
-[code](./code/mmdet3d/models/nerf/nerf_head.py#L307)
+- rays获取
+- rays sample
+- 计算render depth 和render semantic loss
+[code增加注释](./code/mmdet3d/models/nerf/nerf_head.py#L307)
 
+- 算子输入输出不定的时候可参考以下方式
+[自定义算子可参考(调用)](./code/mmdet3d/models/nerf/nerf_head.py#L221)
+[自定义算子可参考(forward&backward)](./code/mmdet3d/models/nerf/utils.py#L26)
+[自定义算子可参考(cuda)](./code/mmdet3d/models/nerf/cuda/render_utils_kernel.cu#L460)
 
 
 ## 使用稠密occ数据训练上

@@ -30,17 +30,17 @@ def create_full_step_id(shape):
     return ray_id, step_id
 
 def sample_ray(ori_rays_o, ori_rays_d, step_size, scene_center, scene_radius, bg_len, world_len, bda, **render_kwargs):
-    rays_o = (ori_rays_o - scene_center) / scene_radius       # normalization
-    rays_d = ori_rays_d / ori_rays_d.norm(dim=-1, keepdim=True)
+    rays_o = (ori_rays_o - scene_center) / scene_radius       # normalization 转换成相对中心的normalize坐标
+    rays_d = ori_rays_d / ori_rays_d.norm(dim=-1, keepdim=True) # 方向也进行nornalize
     N_inner = int(2 / (2+2*bg_len) * world_len / step_size) + 1
     N_outer = N_inner//15   # hardcode: 15
     b_inner = torch.linspace(0, 2, N_inner+1)
     b_outer = 2 / torch.linspace(1, 1/64, N_outer+1)
     t = torch.cat([
-        (b_inner[1:] + b_inner[:-1]) * 0.5,
+        (b_inner[1:] + b_inner[:-1]) * 0.5,#获取两个坐标间的中心点
         (b_outer[1:] + b_outer[:-1]) * 0.5,
     ]).to(rays_o)
-    ray_pts = rays_o[:,None,:] + rays_d[:,None,:] * t[None,:,None]
+    ray_pts = rays_o[:,None,:] + rays_d[:,None,:] * t[None,:,None] #每条rays的（b_inner+b_outer）个采样点
 
     norm = ray_pts.norm(dim=-1, keepdim=True)
     inner_mask = (norm<=1)
@@ -175,7 +175,9 @@ class NerfHead(nn.Module):
             rays_d = rays_d_tr.reshape(-1, 3)
         device = rays_o.device
 
-        # sample points on rays
+        # sample points on rays 获取当前batch下，所有rays的采样点
+        # inner_mask：norm≤1的部分
+        # t:[inner+ouer] len(t)=417 
         ray_pts, inner_mask, t = sample_ray(
             ori_rays_o=rays_o, ori_rays_d=rays_d, 
             step_size=self.step_size, # value：0.5
@@ -186,13 +188,13 @@ class NerfHead(nn.Module):
             bda=bda,
         )
         
-        ray_id, step_id = create_full_step_id(ray_pts.shape[:2])
+        ray_id, step_id = create_full_step_id(ray_pts.shape[:2]) # 获取rayid（例如第一个ray 为 0,0,...0,0） 和 step_id(同一个ray下sample的indexid)
 
-        # skip oversampled points outside scene bbox
+        # skip oversampled points outside scene bbox 去掉过采样点
         mask = inner_mask.clone()
         dist_thres = (2+2*self.bg_len) / self.world_len * self.step_size * 0.95
-        dist = (ray_pts[:,1:] - ray_pts[:,:-1]).norm(dim=-1)
-        mask[:, 1:] |= ub360_utils_cuda.cumdist_thres(dist, dist_thres)
+        dist = (ray_pts[:,1:] - ray_pts[:,:-1]).norm(dim=-1) #相邻两个点间的距离的norm
+        mask[:, 1:] |= ub360_utils_cuda.cumdist_thres(dist, dist_thres) #这里使用的自定义的cuda加速函数，同一条rayd的sample累计间隔小于阈值的就不参与后面计算，超过后再重0开始累加
         ray_pts = ray_pts[mask]
         inner_mask = inner_mask[mask]
 
@@ -204,18 +206,19 @@ class NerfHead(nn.Module):
         # rays sampling
         shape = ray_pts.shape[:-1]
         xyz = ray_pts.reshape(1,1,1,-1,3)
-        ind_norm = ((xyz - self.xyz_min) / (self.xyz_max - self.xyz_min)).flip((-1,)) * 2 - 1
-
+        ind_norm = ((xyz - self.xyz_min) / (self.xyz_max - self.xyz_min)).flip((-1,)) * 2 - 1 #zyx
+        
+        # 获取sample对应density（200*200*16）上的对应特征值
         density = F.grid_sample(density.unsqueeze(0).unsqueeze(1), ind_norm, mode='bilinear', align_corners=True)
         density = density.reshape(1, -1).T.reshape(*shape) 
 
-        
+        # 获取sample对应semantic（200*200*16）上的对应的class特征
         semantic = semantic.permute(3,0,1,2).unsqueeze(0)
         num_classes = semantic.shape[1]
         semantic = F.grid_sample(semantic, ind_norm, mode='bilinear', align_corners=True)
         semantic = semantic.reshape(num_classes, -1).T.reshape(*shape, num_classes)
 
-        alpha = self.activate_density(density, interval=0.5) 
+        alpha = self.activate_density(density, interval=0.5) #获取每个sample的颜色吸收能力  自定义算子可以参考这种写法
         if self.fast_color_thres > 0:
             mask = (alpha > self.fast_color_thres)
             ray_pts = ray_pts[mask]
@@ -229,7 +232,7 @@ class NerfHead(nn.Module):
 
         # compute accumulated transmittance
         N_ray = len(rays_o)
-        weights, alphainv_last = Alphas2Weights.apply(alpha, ray_id.to(alpha.device), N_ray)
+        weights, alphainv_last = Alphas2Weights.apply(alpha, ray_id.to(alpha.device), N_ray) #获取每条ray每个sample剩余的光线强度
         if self.fast_color_thres > 0:
             mask = (weights > self.fast_color_thres)
             inner_mask = inner_mask[mask]
@@ -306,10 +309,11 @@ class NerfHead(nn.Module):
 
     def forward(self, density, semantic, rays=None, bda=None, **kwargs):
         # import pdb;pdb.set_trace()s
+        # rays 是从前后共7帧（6张图片*7帧=42）的且有depthgt的点中选取出38400个点
         gt_depths = rays[..., 2]    # 2 38400
         gt_semantics = rays[..., 3] # 2 38400
-        ray_o = rays[..., 4:7]      # 2 38400 3 
-        ray_d = rays[..., 7:10]     # 2 38400 3
+        ray_o = rays[..., 4:7]      # 2 38400 3 rays起始点，在每个sample的第一帧下
+        ray_d = rays[..., 7:10]     # 2 38400 3 rays方向
 
         losses = {}
         for batch_id in range(rays.shape[0]): 
@@ -329,7 +333,7 @@ class NerfHead(nn.Module):
             results['target_semantic'] = target_semantic
             results['target_depth'] = target_depth
 
-            results.update(
+            results.update(# 获取α(吸收能力)和T（光线强度）
                 self.render_one_scene(
                     rays_o_tr=rays_o_tr,
                     rays_d_tr=rays_d_tr,

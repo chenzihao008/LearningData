@@ -592,8 +592,8 @@ __global__ void alpha2weight_cuda_kernel(
     int i;
     for(i=i_s; i<i_e_max; ++i) {
       T[i] = T_cum;
-      weight[i] = T_cum * alpha[i];
-      T_cum *= (1. - alpha[i]);
+      weight[i] = T_cum * alpha[i];//光线强度*乘吸收能力
+      T_cum *= (1. - alpha[i]);    //光线强度衰减
       if(T_cum<1e-3) {
         i+=1;
         break;

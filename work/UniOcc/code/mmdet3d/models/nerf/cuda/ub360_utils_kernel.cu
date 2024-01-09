@@ -11,8 +11,8 @@
    */
 template <typename scalar_t>
 __global__ void cumdist_thres_cuda_kernel(
-        scalar_t* __restrict__ dist,
-        const float thres,
+        scalar_t* __restrict__ dist,// 两采样点间距离
+        const float thres,          //阈值
         const int n_rays,
         const int n_pts,
         bool* __restrict__ mask) {
@@ -24,16 +24,16 @@ __global__ void cumdist_thres_cuda_kernel(
     int i;
     for(i=i_s; i<i_t; ++i) {
       cum_dist += dist[i];
-      bool over = (cum_dist > thres);
-      cum_dist *= float(!over);
+      bool over = (cum_dist > thres);// dist计算累计值，累加值到过thres的over设置为true，否则为false
+      cum_dist *= float(!over);      // 超过thres的时候，重置cum_dist
       mask[i] = over;
     }
   }
 }
 
 torch::Tensor cumdist_thres_cuda(torch::Tensor dist, float thres) {
-  const int n_rays = dist.size(0);
-  const int n_pts = dist.size(1);
+  const int n_rays = dist.size(0); // ray数量
+  const int n_pts = dist.size(1); // 采样点数量
   const int threads = 256;
   const int blocks = (n_rays + threads - 1) / threads;
   auto mask = torch::zeros({n_rays, n_pts}, torch::dtype(torch::kBool).device(torch::kCUDA));
