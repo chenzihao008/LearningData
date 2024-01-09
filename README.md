@@ -27,6 +27,7 @@
 - 年份：2022
 
 ## 三、BEV Occupancy
+
 ### [SelfOcc：自监督的方式生成occ]
 - 年份：2023
 ### [SURROUNDOCC: lidar数据生成gt,只有image输入](work/surroundocc/surroundocc.md)
@@ -37,7 +38,7 @@
 - 缓解3D CONV 带来的计算开销
 ### [UniOcc: 只有image输入，增加2d的depth和sam监督](work/UniOcc/UniOcc.md)
 - 年份：2023
-- 通过体渲染增加depth和segmentation的监督，缓解对于occ标注的依赖
+- 通过体渲染增加Depth和Semantic render的监督，缓解对于occ标注的依赖
 ### [Occ3D]TODO
 ### [OctreeOcc](work/OctreeOcc/OctreeOcc.md)
 ### [BEVDet]
