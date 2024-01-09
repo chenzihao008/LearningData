@@ -37,7 +37,7 @@ UniOcc
 - 不使用occlabel，仅使用Rendering Sup也能获得差不多的结果（重点）
     - 说明该方法有巨大潜力
     - ![image](./picture/ablation是否使用3Docclabel.png)
-![image](./picture/ablationstudy.png)
+    - ![image](./picture/ablationstudy.png)
 # 复现
 - 环境
     - ubuntu 20.04
