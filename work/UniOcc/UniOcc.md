@@ -1,6 +1,7 @@
 UniOcc
-- 缓解对3Docc标注的依赖：增加2D的深度图和分割图（通过SAM或者Visionllm获取）监督3D occ的生成，*有减少3D分割标注的巨大潜力*
 === 
+- 缓解对3Docc标注的依赖：增加2D的深度图和分割图（通过SAM或者Visionllm获取）监督3D occ的生成，*有减少3D分割标注的巨大潜力*
+
 ![image](./picture/UniOcc框架.png)
 # 论文总结
 ## 主要贡献
@@ -8,8 +9,8 @@ UniOcc
     - 使用体渲染的方式生成depth和semantic
     - 参考：Mip-NeRF 360 
     - 公式
-    和体渲染公式基本一致
-    ![image](./picture/depth和sematic获取方式.png)
+        - 和体渲染公式基本一致
+        - ![image](./picture/depth和sematic获取方式.png)
     - 输出输入voxel_feats
         - shape：bnwhdc
     - 输出
@@ -24,7 +25,7 @@ UniOcc
     - 半监督方法,用于充分利用未标注的数据
     - 使用学生模型的ema更新教师模型的参数
     - 结合真实的激光雷达深度投影
-    ![image](./picture/Depth-awareTeacherStudent.png)
+    - ![image](./picture/Depth-awareTeacherStudent.png)
 ## 消融实验
 -  visibility mask、Rendering Sup 和 Stronger Setting 对MIOU提升较多
     - visibility mask（正常的数据增强）
