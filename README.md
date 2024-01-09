@@ -53,4 +53,4 @@
 ### [Mip-NeRF360](work/NERF/Mip-NeRF360/Mip-NeRF360.md)
 
 
-## 六、[mmdetection3D部署相关内容](work/mmdetection3D_deployment/mmdetection3D_deploy.md)
+
