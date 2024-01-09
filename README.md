@@ -27,7 +27,11 @@
 - 年份：2022
 
 ## 三、BEV Occupancy
-
+- 关注点：
+    1. miou、模型性能
+    2. occ精细程度
+    3. 感知距离
+    4. 训练数据获取
 ### [SelfOcc：自监督的方式生成occ]
 - 年份：2023
 ### [SURROUNDOCC: lidar数据生成gt,只有image输入](work/surroundocc/surroundocc.md)
@@ -40,13 +44,11 @@
 - 年份：2023
 - 通过体渲染增加Depth和Semantic render的监督，缓解对于occ标注的依赖
 ### [Occ3D]TODO
-### [OctreeOcc](work/OctreeOcc/OctreeOcc.md)
+
 ### [BEVDet]
 ## 四、[CUDA-BEVFUSION：image和lidar融合](work/CUDA-BEVFusion/CUDA-BEVFUSION.md)
 ## 五、NERF
-TODO
-### [Repaint123]
-### [DVGO]
+
 ### [NERF](work/NERF/NERF/NERF.md)
 ### [Mip-NeRF360](work/NERF/Mip-NeRF360/Mip-NeRF360.md)
 
