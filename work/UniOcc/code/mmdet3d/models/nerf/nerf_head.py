@@ -34,8 +34,8 @@ def sample_ray(ori_rays_o, ori_rays_d, step_size, scene_center, scene_radius, bg
     rays_d = ori_rays_d / ori_rays_d.norm(dim=-1, keepdim=True) # 方向也进行nornalize
     N_inner = int(2 / (2+2*bg_len) * world_len / step_size) + 1
     N_outer = N_inner//15   # hardcode: 15
-    b_inner = torch.linspace(0, 2, N_inner+1)
-    b_outer = 2 / torch.linspace(1, 1/64, N_outer+1)
+    b_inner = torch.linspace(0, 2, N_inner+1)        # 0-2 sample数量=391
+    b_outer = 2 / torch.linspace(1, 1/64, N_outer+1) # 2-128 sample数量=26
     t = torch.cat([
         (b_inner[1:] + b_inner[:-1]) * 0.5,#获取两个坐标间的中心点
         (b_outer[1:] + b_outer[:-1]) * 0.5,
@@ -185,7 +185,7 @@ class NerfHead(nn.Module):
             scene_radius=self.scene_radius,  # value：39 39 39 
             bg_len=self.bg_len,              # value：0.0256
             world_len=self.world_len,        # value：200
-            bda=bda,
+            bda=bda,                         # 数据增强 3*3
         )
         
         ray_id, step_id = create_full_step_id(ray_pts.shape[:2]) # 获取rayid（例如第一个ray 为 0,0,...0,0） 和 step_id(同一个ray下sample的indexid)
@@ -200,7 +200,7 @@ class NerfHead(nn.Module):
 
         N_ray = len(rays_o)
         t = t[None].repeat(N_ray,1)[mask]
-        ray_id = ray_id[mask.flatten()].to(device)
+        ray_id = ray_id[mask.flatten()].to(device)    #有点类似cudabevfusion的bevpool操作，同一个rayid(inverval)进行处理
         step_id = step_id[mask.flatten()].to(device)
 
         # rays sampling
@@ -337,7 +337,7 @@ class NerfHead(nn.Module):
                 self.render_one_scene(
                     rays_o_tr=rays_o_tr,
                     rays_d_tr=rays_d_tr,
-                    bda=bda[batch_id],
+                    bda=bda[batch_id], # 数据增强矩阵 3*3
                     mask = mask,
                     density=density[batch_id],
                     semantic=semantic[batch_id],

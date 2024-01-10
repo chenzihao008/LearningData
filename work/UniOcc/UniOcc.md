@@ -3,6 +3,11 @@ UniOcc
 - 缓解对3Docc标注的依赖：增加2D的深度图和分割图（通过SAM或者Visionllm获取）监督3D occ的生成，*有减少3D分割标注的巨大潜力*
 
 ![image](./picture/UniOcc框架.png)
+1. swintransformer 提取图像特征
+2. FPN_LSS 构造成伪点云
+3. 将LSS特征transofor到bev视角下
+4. 提取bev视角下voxel特征
+5. 计算depth和sematic的renderloss
 # 论文总结
 ## 主要贡献
 1. Volumn Rendering Supervision
@@ -95,4 +100,4 @@ UniOcc
     3. [自定义算子可参考(cuda)](./code/mmdet3d/models/nerf/cuda/render_utils_kernel.cu#L460)
 
 
-## 使用稠密occ数据训练上
+## 使用稠密occ数据训练上（todo）

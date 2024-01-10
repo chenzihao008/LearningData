@@ -33,14 +33,14 @@ def generate_frustum(img, cam2ego, cam_intrinsic):
 
 def get_rays(i, j, K, c2w, inverse_y=True):
     if inverse_y:
-        dirs = torch.stack([(i-K[0][2])/K[0][0], (j-K[1][2])/K[1][1], torch.ones_like(i)], -1)
+        dirs = torch.stack([(i-K[0][2])/K[0][0], (j-K[1][2])/K[1][1], torch.ones_like(i)], -1) # 变换到相机坐标，先减shift再除scale
     else:
         dirs = torch.stack([(i-K[0][2])/K[0][0], -(j-K[1][2])/K[1][1], -torch.ones_like(i)], -1)
 
     # Rotate ray directions from camera frame to the world frame
-    rays_d = torch.sum(dirs[..., np.newaxis, :] * c2w[:3,:3], -1)  # dot product, equals to: [c2w.dot(dir) for dir in dirs]
+    rays_d = torch.sum(dirs[..., np.newaxis, :] * c2w[:3,:3], -1)  # dot product, equals to: [c2w.dot(dir) for dir in dirs] #深度为1m（其实是把总深度压缩到1）的部分转换到世界坐标
     # Translate camera frame's origin to the world frame. It is the origin of all rays.
-    rays_o = c2w[:3,3].expand(rays_d.shape)
+    rays_o = c2w[:3,3].expand(rays_d.shape) #[:,3]起始点[:3,:3]只是旋转部分
     viewdirs = rays_d / rays_d.norm(dim=-1, keepdim=True)   
     return rays_o, rays_d, viewdirs
 
@@ -80,7 +80,7 @@ def generate_rays(coors, label_depths, label_segs, c2w, intrins, max_ray_nums=0,
     ids = []
     for time_id in time_ids:    # multi frames
         for i in time_ids[time_id]: # multi cameras of single frame
-            ray = pts2ray(coors[i], label_depths[i], label_segs[i], c2w[i], intrins[i])
+            ray = pts2ray(coors[i], label_depths[i], label_segs[i], c2w[i], intrins[i])# 该画面下带有深度的点的xy信息[[x1,y1],[x2,y2s]...]
             rays.append(ray)
             ids.append(time_id)
 
