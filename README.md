@@ -21,7 +21,7 @@
     3. 感知距离
     4. 训练数据获取
         - 点云稠密程度决定了gtocc的稠密程度
-### [SelfOcc]
+### [SelfOcc todo]()
   - 年份：2023
   - 自监督的方式生成occ
 ### [SURROUNDOCC](work/surroundocc/surroundocc.md)
@@ -41,38 +41,21 @@
 ## 四、2D目标检测&跟踪
 ### [YOLO8]()
 - [TRT Deployment](work/yolov8/yolov8_depolyment.md)
-### [RTDETR]()
-### [fast RCNN]()
-
-
-### [ByteTrack]()
 ## 五、NERF
-### [GaussianEditor：可编辑nerf](work/NERF/GaussianEditor/GaussianEditor.md)
-### [Repaint123]()
-### [DVGO]()
 ### [NERF](work/NERF/NERF/NERF.md)
-### [NERF++: 将前景和背景分开]()
-### [Mip-NeRF360：解决漂浮物问题](work/NERF/Mip-NeRF360/Mip-NeRF360.md)
-
+### [Mip-NeRF360](work/NERF/Mip-NeRF360/Mip-NeRF360.md)
+- 解决漂浮物问题
+### [NERF++ todo]()
+- 将前景和背景分开
 
 ## 八、[mmdetection3D部署相关内容](work/mmdetection3D_deployment/mmdetection3D_deploy.md)
 # 资料整理
 （空缺内容在本地文件上待整理上来）
 ## 1.[感知算法框架](Data/感知算法框架.md)
 ## 2.[Transformer/Swin-transformer/deformable](Data/Transformer.md)
-## 3.[Loss](Data/loss/loss.md)
-## 4.[Optimizer](Date/)
-## 5.[Normalization]()
-## 6.[激活函数]()
-## 7.[多卡训练]()
-## 8.[模型优化知识](Data/模型优化知识.md)
-## 9.[Cuda&Tensorrt&量化](Data/Cuda&Tensorrt.md)
-## 11.训练trick汇总
-## 12.C++笔记
-## 13.[数据集](Data/dataset.md) 
-## 14.open3d
-## 15.mmdetection3D
-## 17.[openCV]()
-## 16.[卡尔曼滤波]()
-## 17.[基础PCL](Data/PCL/PCL.md)
-## 18.[毫米波雷达](Data/毫米波雷达/RADAR.md)
+
+## 3.[模型优化知识](Data/模型优化知识.md)
+## 4.[Cuda&Tensorrt&量化](Data/Cuda&Tensorrt.md)
+## 5.[数据集](Data/dataset.md) 
+## 6.[基础PCL](Data/PCL/PCL.md)
+## 7.[毫米波雷达](Data/毫米波雷达/RADAR.md)
