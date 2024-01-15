@@ -49,7 +49,8 @@ make前记得修改../../config/Makefile.config文件内的cuda配置
 ```
 
 
-2. 按ctl+shift+p 选择 c_cpp_properties.json，会在.vscode 生成c_cpp_properties.json文件
+2. 按ctl+shift+p,选择Edit Configurations 选择 c_cpp_properties.json，会在.vscode 生成c_cpp_properties.json文件
+- 用于在vscode中可以跳转引用
 ```
 {
     "configurations": [

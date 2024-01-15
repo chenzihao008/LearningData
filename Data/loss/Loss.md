@@ -20,7 +20,7 @@
 
 ## Focal Loss
 
-
+## BCE Loss
 
 
 
