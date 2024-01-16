@@ -262,8 +262,10 @@ void SleepMultiStream(
 官网：https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html
 参考： https://zhuanlan.zhihu.com/p/667391183
 
-- [coda](../Data/cuda/bilinear_interpolation.cu)
-
+- [coda 极简版](../Data/cuda/bilinear_interpolation/src/main.cpp)
+- 注意：
+  1. cu文件不能通过cpp文件直接调用，需要通过hpp文件
+  2. 需要导入 #include "cuda_runtime_api.h"
 # 六、Tensorrt介绍
 - NVIDIA GPU的一种优化编译器
     - 自动优化模型

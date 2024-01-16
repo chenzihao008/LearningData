@@ -1,0 +1,50 @@
+[
+    {
+        "arguments": [
+            "cc",
+            "-c",
+            "-std=c++11",
+            "-pthread",
+            "-fPIC",
+            "-O3",
+            "-w",
+            "-I",
+            "/usr/local/cuda-11.1/include",
+            "-I",
+            "src",
+            "-I",
+            "/usr/local/include/opencv4",
+            "-I",
+            "include",
+            "-o",
+            "build/main.cpp.o",
+            "src/main.cpp"
+        ],
+        "directory": "/mnt/allfile/project/cudatest",
+        "file": "src/main.cpp"
+    },
+    {
+        "arguments": [
+            "/usr/local/cuda-11.1/bin/nvcc",
+            "-c",
+            "--shared",
+            "-Xcompiler",
+            "-fPIC",
+            "-O3",
+            "-w",
+            "-I",
+            "/usr/local/cuda-11.1/include",
+            "-I",
+            "src",
+            "-I",
+            "/usr/local/include/opencv4",
+            "-I",
+            "include",
+            "-o",
+            "build/process.cu.o",
+            "src/process.cu"
+        ],
+        "directory": "/mnt/allfile/project/cudatest",
+        "file": "src/process.cu"
+    }
+]

@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.cu": "cuda-cpp",
+        "ratio": "cpp",
+        "string": "cpp"
+    }
+
+}
