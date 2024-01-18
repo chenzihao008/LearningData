@@ -25,15 +25,15 @@ yolo5_pcb_defect_detection
 
 # 详细数据
 - 序号1(baseline)
-![结果1](./picture/pcbtain1.png)
+    ![结果1](./picture/pcbtain1.png)
 - 序号2
-![结果2](./picture/pcbtrain2.png)
+    ![结果2](./picture/pcbtrain2.png)
 - 序号3
-![结果3](./picture/pcbtrain3.png)
+    ![结果3](./picture/pcbtrain3.png)
   - 当数据集类别数量较为平衡，增加focalloss反而会降低模型性能
 - 序号4
-![结果4](./picture/pcbtrain4.png)
+    ![结果4](./picture/pcbtrain4.png)
 - 序号5
-![结果5](./picture/pcbtrain5.png)
+    ![结果5](./picture/pcbtrain5.png)
 
 # 瑞芯微开发板部署(todo)
