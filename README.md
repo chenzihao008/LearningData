@@ -1,5 +1,6 @@
 # 开源项目整理&实验
-## 一、单目&多目&多传感器3D目标检测
+## 一、单目&多目&多传感器2D&3D目标检测
+### [基于yolo5的pcb开源数据集缺陷检测](work/yolo5_pcb_defect_detection/yolo5_pcb_defect_detection.md)
 ### [MONOCON3D](https://github.com/chenzihao008/monocon_rp)
   - 年份：2022
 ### [DERT3D](work/DERT3D/DERT3D.md)
