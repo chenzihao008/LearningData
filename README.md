@@ -49,7 +49,7 @@
     3. 感知距离
     4. 训练数据获取
         - 点云稠密程度决定了gtocc的稠密程度
-- [LinK3D]()
+- [LinK3D todo]()
   - 年份：2023
   - 新的3D特征表示方法，提高特征鲁棒性
 - [SelfOcc todo]()
@@ -70,7 +70,6 @@
   - 通过体渲染增加Depth和Semantic render的监督，缓解对于occ标注的依赖
 ## 三、[CUDA-BEVFUSION：image和lidar融合](work/CUDA-BEVFusion/CUDA-BEVFUSION.md)
 ## 四、2D目标检测&跟踪
-- [YOLO8]()
 - [TRT Deployment](work/yolov8/yolov8_depolyment.md)
 ## 五、NERF
 - [NERF](work/NERF/NERF/NERF.md)
