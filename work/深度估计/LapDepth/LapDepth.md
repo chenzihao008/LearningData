@@ -8,6 +8,8 @@ LapDepth
 |混合量化|-|该部分仅测试速度|
 
 ## 可视化（转化成相对深度）
+- 原图
+  ![image](./pictures/nyu_demo.jpg)
 - FP32
   ![IMAGE](./pictures/out_together_nyu_demo.jpg)
 - FP16
