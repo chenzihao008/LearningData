@@ -87,3 +87,4 @@
 ## 3.[Cuda&Tensorrt&量化](Data/Cuda&Tensorrt.md)
 ## 4.[毫米波雷达](Data/毫米波雷达/RADAR.md)
 ## 5.[瑞芯微模型部署说明](Data/瑞芯微部署/瑞芯微部署.md)
+## 6.[pytorch cpp cuda扩展](Data/pytorch/pytorch_cpp_cuda扩展/cuda_extension.md)

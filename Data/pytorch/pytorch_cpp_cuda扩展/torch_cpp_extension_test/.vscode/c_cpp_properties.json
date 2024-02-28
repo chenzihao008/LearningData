@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/mnt/allfile/conda/envs/FlashOcc/include/python3.8",
+                "/mnt/allfile/conda/envs/FlashOcc/lib/python3.8/site-packages/torch/include",
+                "/mnt/allfile/conda/envs/FlashOcc/lib/python3.8/site-packages/torch/include/torch/csrc/api/include"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c17",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}
