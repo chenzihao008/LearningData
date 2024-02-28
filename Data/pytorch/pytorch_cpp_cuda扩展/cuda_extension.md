@@ -1,8 +1,8 @@
 pytorch_cpp_cuda扩展
 ---
-官网：https://pytorch.org/tutorials/advanced/cpp_extension.html
-参考地址（mmcv）：https://zhuanlan.zhihu.com/p/348555597
-参考视频：https://www.youtube.com/watch?v=oG0WUq3bRz0&list=PLDV2CyUo4q-LKuiNltBqCKdO9GH4SS_ec&index=6
+- 官网：https://pytorch.org/tutorials/advanced/cpp_extension.html
+- 参考地址（mmcv）：https://zhuanlan.zhihu.com/p/348555597
+- 参考视频：https://www.youtube.com/watch?v=oG0WUq3bRz0&list=PLDV2CyUo4q-LKuiNltBqCKdO9GH4SS_ec&index=6
 
 [demo code文件夹](./torch_cpp_extension_test/)
 1. vscode配置环境
